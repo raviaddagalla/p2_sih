@@ -1,21 +1,137 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Shield, Lock, Mail, KeyRound, Sparkles, CheckCircle2, ArrowRight, ShieldCheck, Zap
+  Shield, Lock, Mail, KeyRound, Sparkles, CheckCircle2, ArrowRight, 
+  ShieldCheck, Zap, User, Clock, Check
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
+import { Button } from '@/components/ui/Button';
+
+interface DemoAccount {
+  name: string;
+  role: string;
+  email: string;
+  badge: string;
+  agency: string;
+}
+
+const DEMO_ACCOUNTS: DemoAccount[] = [
+  {
+    name: 'IO Rajan Sharma',
+    role: 'Investigating Officer',
+    email: 'io.sharma@mahapolice.gov.in',
+    badge: 'MH-CY-8841',
+    agency: 'State Cyber Cell, Mumbai'
+  },
+  {
+    name: 'SP Neha Verma',
+    role: 'Superintendent of Police',
+    email: 'sp.verma@delhipolice.gov.in',
+    badge: 'DL-CY-1002',
+    agency: 'Special Cell (IFSO), New Delhi'
+  },
+  {
+    name: 'Inspector Anand Rao',
+    role: 'Cyber Cell Lead',
+    email: 'anand.rao@ksp.gov.in',
+    badge: 'KA-CY-4920',
+    agency: 'CID Cyber Crime, Bengaluru'
+  }
+];
 
 export default function LoginPage() {
   const router = useRouter();
   const { setUser } = useAppStore();
 
   const [step, setStep] = useState<'credentials' | 'otp'>('credentials');
-  const [email, setEmail] = useState('io@demo.gov.in');
+  const [email, setEmail] = useState('io.sharma@mahapolice.gov.in');
   const [password, setPassword] = useState('Demo@1234');
-  const [otp, setOtp] = useState(['1', '2', '3', '4', '5', '6']);
+  const [selectedAccount, setSelectedAccount] = useState<DemoAccount>(DEMO_ACCOUNTS[0]);
+  const [otp, setOtp] = useState(['5', '8', '2', '9', '4', '1']);
   const [loading, setLoading] = useState(false);
+  const [otpSuccess, setOtpSuccess] = useState(false);
+
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Animated Drifting Light Network Graph for Left Panel
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let width = (canvas.width = canvas.offsetWidth);
+    let height = (canvas.height = canvas.offsetHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener('resize', handleResize);
+
+    const nodeColors = ['#FFFFFF', '#EEF0FF', '#E0F7FB', '#FDE8F3'];
+    const nodes = Array.from({ length: 38 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.45,
+      vy: (Math.random() - 0.5) * 0.45,
+      radius: Math.random() * 3 + 2.5,
+      color: nodeColors[Math.floor(Math.random() * nodeColors.length)],
+    }));
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw subtle connection lines
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 130) {
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.28 * (1 - dist / 130)})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw nodes
+      nodes.forEach((node) => {
+        node.x += node.vx;
+        node.y += node.vy;
+
+        if (node.x < 0 || node.x > width) node.vx *= -1;
+        if (node.y < 0 || node.y > height) node.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fillStyle = node.color;
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
 
   const handleCredentialsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,211 +139,336 @@ export default function LoginPage() {
     setTimeout(() => {
       setLoading(false);
       setStep('otp');
-    }, 400);
+    }, 450);
+  };
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (value.length > 1) {
+      value = value[value.length - 1];
+    }
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto-advance
+    if (value && index < 5) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
   };
 
   const handleOtpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
+      setLoading(false);
+      setOtpSuccess(true);
       setUser({
-        id: 'user-io-01',
-        name: 'IO Rajan Sharma',
-        email: email,
+        id: 'user-01',
+        name: selectedAccount.name,
+        email: selectedAccount.email,
         role: 'IO',
-        badge_no: 'MH-CY-2024-8841',
-        agency_id: 'agency-mh-01'
+        badge_no: selectedAccount.badge,
+        agency_id: selectedAccount.agency
       });
-      router.push('/dashboard');
-    }, 500);
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 700);
+    }, 600);
   };
 
-  const fillDemoAccount = (demoEmail: string) => {
-    setEmail(demoEmail);
+  const selectDemoAccount = (acc: DemoAccount) => {
+    setSelectedAccount(acc);
+    setEmail(acc.email);
     setPassword('Demo@1234');
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-[#070B14] text-white overflow-hidden relative">
-      {/* Left Column: Cinematic Visual & Stats */}
-      <div className="hidden lg:flex flex-1 flex-col justify-between p-12 relative border-r border-white/10 cyber-grid-bg">
-        {/* Top Logo */}
-        <div className="flex items-center gap-3 z-10">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-glow-cyan">
-            <Shield className="w-7 h-7 text-black fill-black/20" />
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-canvas text-primary">
+      {/* Left Column (60%): Vivid Gradient Mesh & Animated Network Graph */}
+      <div className="relative flex-1 lg:flex-[1.4] bg-gradient-to-br from-[#4F46E5] via-[#8B5CF6] to-[#EC4899] p-8 lg:p-14 flex flex-col justify-between overflow-hidden text-white select-none">
+        {/* Animated Network Canvas */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+        />
+
+        {/* Ambient subtle glow overlay */}
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-pink-400/20 blur-3xl pointer-events-none" />
+
+        {/* Top Branding */}
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg shadow-black/10">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl font-extrabold tracking-tight font-display text-white">
+                  ChainShield
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/25 text-white uppercase border border-white/30">
+                  LEA v2.0
+                </span>
+              </div>
+              <p className="text-xs text-white/80 font-medium">
+                Real-Time Crypto Fraud Attribution & Asset Freeze Platform
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-black tracking-wider">
-              CHAIN<span className="text-cyan-400">SHIELD</span>
-            </h1>
-            <p className="text-xs text-slate-400 font-mono">
-              Real-Time Crypto Fraud Attribution Platform
-            </p>
+
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 border border-white/25 text-xs text-white backdrop-blur-md font-mono">
+            <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+            <span>FIU-IND & Section 106 BNSS Ready</span>
           </div>
         </div>
 
-        {/* Center Tagline & Graphic */}
-        <div className="z-10 max-w-lg space-y-6 my-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-400/40 text-cyan-300 text-xs font-mono">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Built for Indian Law Enforcement Agencies</span>
+        {/* Center Punchy Headline & Mission Statement */}
+        <div className="relative z-10 my-12 max-w-xl space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-xs font-semibold backdrop-blur-md">
+            <Zap className="w-3.5 h-3.5 text-yellow-300" />
+            <span>Forensic speed for cyber cell investigators</span>
           </div>
 
-          <h2 className="text-4xl xl:text-5xl font-extrabold tracking-tight leading-tight">
-            From victim complaint to <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">exchange freeze request</span> in seconds.
+          <h2 className="text-3xl lg:text-5xl font-black font-display tracking-tight text-white leading-tight">
+            From victim complaint to exchange freeze request in seconds.
           </h2>
 
-          <p className="text-slate-300 text-sm leading-relaxed">
-            Automating cross-chain tracing across TRON, Bitcoin, and EVM networks. Direct integration with FIU-IND registered VASPs under Section 106 BNSS 2023.
+          <p className="text-sm lg:text-base text-white/90 leading-relaxed font-sans">
+            Automating multi-hop blockchain tracing across TRON, Bitcoin, Ethereum, and EVM chains. Instant VASP deposit clustering with Section 106 BNSS requisition notices.
           </p>
-
-          {/* 3 Key Stats */}
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
-            <div>
-              <div className="text-2xl font-extrabold text-cyan-400 font-mono">₹ 318 Cr+</div>
-              <div className="text-xs text-slate-400">Fraud Flagged</div>
-            </div>
-            <div>
-              <div className="text-2xl font-extrabold text-emerald-400 font-mono">6.4s</div>
-              <div className="text-xs text-slate-400">Avg Attribution</div>
-            </div>
-            <div>
-              <div className="text-2xl font-extrabold text-white font-mono">15 States</div>
-              <div className="text-xs text-slate-400">Cyber Cells Live</div>
-            </div>
-          </div>
         </div>
 
-        {/* Bottom Banner */}
-        <div className="z-10 text-xs text-slate-500 font-mono flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>Compliant with MHA I4C Standard Operating Procedures (SOP)</span>
+        {/* Floating Stat Cards Strip */}
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="p-4 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 shadow-lg space-y-1">
+            <div className="flex items-center gap-2 text-white/80 text-xs font-semibold">
+              <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+              Attribution Confidence
+            </div>
+            <div className="text-2xl font-black font-display text-white">
+              94.2%
+            </div>
+            <div className="text-[10px] text-white/70">
+              Deterministic VASP matching
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 shadow-lg space-y-1">
+            <div className="flex items-center gap-2 text-white/80 text-xs font-semibold">
+              <Clock className="w-4 h-4 text-cyan-300" />
+              Time-to-Attribution
+            </div>
+            <div className="text-2xl font-black font-display text-white">
+              &lt; 8.0s
+            </div>
+            <div className="text-[10px] text-white/70">
+              Multi-hop sweep resolution
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 shadow-lg space-y-1">
+            <div className="flex items-center gap-2 text-white/80 text-xs font-semibold">
+              <ShieldCheck className="w-4 h-4 text-pink-200" />
+              Custodial Recovery
+            </div>
+            <div className="text-2xl font-black font-display text-white">
+              ₹122.9 Cr
+            </div>
+            <div className="text-[10px] text-white/70">
+              Frozen at FIU exchanges
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Right Column: Glass Login Card */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 relative z-10">
-        <div className="w-full max-w-md p-8 rounded-3xl glass-panel-elevated border border-white/10 shadow-2xl space-y-6">
-          <div className="text-center space-y-1.5">
-            <h3 className="text-2xl font-bold tracking-tight text-white font-sans">
-              {step === 'credentials' ? 'LEA Officer Login' : 'MFA Identity Verification'}
-            </h3>
-            <p className="text-xs text-slate-400">
-              {step === 'credentials' 
-                ? 'Access restricted to authorized cyber crime personnel'
-                : 'Enter the 6-digit cryptographic security code'}
-            </p>
+      {/* Right Column (40%): Clean White Login Card */}
+      <div className="flex-1 lg:flex-[1.0] bg-surface flex flex-col justify-between p-8 lg:p-14 border-l border-border">
+        {/* Top Header */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-brand-indigo" />
+            <span className="text-xs font-bold uppercase tracking-wider text-muted font-mono">
+              OFFICIAL LEA PORTAL ACCESS
+            </span>
           </div>
 
-          {step === 'credentials' ? (
-            <form onSubmit={handleCredentialsSubmit} className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Official Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950/70 border border-white/10 text-sm text-white focus:outline-none focus:border-cyan-400 font-sans"
-                    placeholder="officer@demo.gov.in"
-                  />
-                </div>
-              </div>
+          <h3 className="text-2xl lg:text-3xl font-black font-display text-primary tracking-tight">
+            {step === 'credentials' ? 'Officer Authentication' : 'Two-Factor OTP Verification'}
+          </h3>
 
-              <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950/70 border border-white/10 text-sm text-white focus:outline-none focus:border-cyan-400 font-sans"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
+          <p className="text-xs text-secondary">
+            {step === 'credentials' 
+              ? 'Authorized for State Cyber Crime Cells, CID, IFSO, and Central Investigative Agencies.'
+              : `Enter the 6-digit OTP sent to verified terminal (${email}).`}
+          </p>
+        </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-sm tracking-wide shadow-glow-cyan transition-all flex items-center justify-center gap-2"
-              >
-                <span>{loading ? 'Authenticating...' : 'Proceed to MFA'}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-              {/* Quick Demo Accounts Chips */}
-              <div className="pt-4 border-t border-white/10 space-y-2">
-                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                  Quick Demo Accounts:
-                </span>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => fillDemoAccount('io@demo.gov.in')}
-                    className="px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-white/10 text-cyan-300 font-mono text-[11px] transition-colors"
-                  >
-                    io@demo.gov.in (IO)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillDemoAccount('supervisor@demo.gov.in')}
-                    className="px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-white/10 text-slate-300 font-mono text-[11px] transition-colors"
-                  >
-                    supervisor@demo.gov.in (SP)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillDemoAccount('nodal@demo.gov.in')}
-                    className="px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-white/10 text-slate-300 font-mono text-[11px] transition-colors"
-                  >
-                    nodal@demo.gov.in (I4C)
-                  </button>
-                </div>
+        {/* Step 1: Credentials Form */}
+        {step === 'credentials' ? (
+          <form onSubmit={handleCredentialsSubmit} className="my-8 space-y-5">
+            {/* Quick Demo Account Selector Chips */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-secondary uppercase font-mono tracking-wide">
+                Quick Autofill Demo Officer:
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {DEMO_ACCOUNTS.map((acc, idx) => {
+                  const isSelected = selectedAccount.email === acc.email;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => selectDemoAccount(acc)}
+                      className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all ${
+                        isSelected
+                          ? 'border-brand-indigo bg-brand-indigoTint shadow-xs'
+                          : 'border-border bg-surface hover:bg-subtle'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                          isSelected ? 'bg-brand-indigo text-white' : 'bg-subtle text-secondary'
+                        }`}>
+                          {acc.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-primary truncate">
+                            {acc.name}
+                          </div>
+                          <div className="text-[10px] text-muted truncate">
+                            {acc.role} · {acc.badge}
+                          </div>
+                        </div>
+                      </div>
+                      {isSelected && (
+                        <Check className="w-4 h-4 text-brand-indigo shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-            </form>
-          ) : (
-            <form onSubmit={handleOtpSubmit} className="space-y-6">
-              <div className="flex justify-center gap-2">
+            </div>
+
+            {/* Email Field */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-secondary">
+                Official Government Email
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full h-10 pl-10 pr-3 rounded-xl border border-border bg-subtle/40 focus:bg-surface focus:border-brand-indigo focus:ring-4 focus:ring-brand-indigo/10 outline-none text-xs text-primary font-medium transition-all"
+                  placeholder="name@agency.gov.in"
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-secondary">
+                Cryptographic Access Key / Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full h-10 pl-10 pr-3 rounded-xl border border-border bg-subtle/40 focus:bg-surface focus:border-brand-indigo focus:ring-4 focus:ring-brand-indigo/10 outline-none text-xs text-primary font-medium transition-all"
+                  placeholder="••••••••••••"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              loading={loading}
+              className="w-full justify-center"
+              icon={<ArrowRight className="w-4 h-4" />}
+            >
+              Continue to OTP Verification
+            </Button>
+          </form>
+        ) : (
+          /* Step 2: 6-Digit Polished OTP Form */
+          <form onSubmit={handleOtpSubmit} className="my-8 space-y-6">
+            <div className="space-y-3">
+              <label className="text-xs font-bold text-secondary uppercase font-mono tracking-wide">
+                Terminal Security Code (6 Digits):
+              </label>
+
+              <div className="flex items-center justify-between gap-2">
                 {otp.map((digit, idx) => (
                   <input
                     key={idx}
+                    ref={(el) => { otpRefs.current[idx] = el; }}
                     type="text"
                     maxLength={1}
                     value={digit}
-                    onChange={(e) => {
-                      const newOtp = [...otp];
-                      newOtp[idx] = e.target.value;
-                      setOtp(newOtp);
-                    }}
-                    className="w-11 h-12 text-center rounded-xl bg-slate-950/80 border border-cyan-400/50 text-xl font-mono font-bold text-cyan-400 focus:outline-none focus:border-cyan-300 shadow-glow-cyan"
+                    autoFocus={idx === 0}
+                    onChange={(e) => handleOtpChange(idx, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                    className="w-12 h-14 text-center text-xl font-bold font-mono rounded-xl border-2 border-border focus:border-brand-indigo focus:ring-4 focus:ring-brand-indigo/15 outline-none bg-surface text-primary shadow-xs transition-all"
                   />
                 ))}
               </div>
+            </div>
 
-              <div className="text-center text-xs text-slate-400">
-                <span>Demo Code: </span>
-                <strong className="text-cyan-300 font-mono">123456</strong>
-              </div>
+            <div className="p-3 rounded-xl bg-brand-indigoTint border border-brand-indigo/20 flex items-center justify-between text-xs text-brand-indigo font-semibold">
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-brand-indigo" />
+                Demo 2FA OTP Pre-filled
+              </span>
+              <span className="font-mono text-[11px] underline cursor-pointer" onClick={() => setOtp(['5', '8', '2', '9', '4', '1'])}>
+                Reset OTP
+              </span>
+            </div>
 
-              <button
+            <div className="space-y-2">
+              <Button
                 type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-500 hover:from-emerald-300 hover:to-cyan-400 text-black font-extrabold text-sm tracking-wide shadow-glow-emerald transition-all flex items-center justify-center gap-2"
+                variant={otpSuccess ? 'success' : 'primary'}
+                size="lg"
+                loading={loading}
+                className="w-full justify-center text-sm font-bold"
+                icon={otpSuccess ? <CheckCircle2 className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>{loading ? 'Verifying...' : 'Verify & Enter Command Center'}</span>
-              </button>
-            </form>
-          )}
+                {otpSuccess ? 'Access Granted · Opening Workspace...' : 'Authorize Terminal Session'}
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="md"
+                onClick={() => setStep('credentials')}
+                className="w-full justify-center text-xs text-secondary"
+              >
+                ← Back to Credentials
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {/* Footer Note */}
+        <div className="pt-4 border-t border-border flex items-center justify-between text-[11px] text-muted font-mono">
+          <span>Simulation Engine · 250 Cases</span>
+          <span className="px-2 py-0.5 rounded bg-semantic-warningTint text-semantic-warningText border border-semantic-warning/20 font-bold">
+            DEMO DATA ONLY
+          </span>
         </div>
       </div>
     </div>

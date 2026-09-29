@@ -1,80 +1,115 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #070B14;
-  --foreground: #F8FAFC;
+  color-scheme: light;
+  --bg-canvas: #F6F8FC;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #EEF2F9;
+  --bg-inverse: #0F172A;
+  --border: #E3E8F2;
+  --border-strong: #CBD5E6;
+  --text-primary: #0B1220;
+  --text-secondary: #46536B;
+  --text-muted: #7B879C;
+
+  --brand-indigo: #4F46E5;
+  --brand-indigo-hover: #4338CA;
+  --brand-indigo-tint: #EEF0FF;
+  --brand-cyan: #06B6D4;
+  --brand-cyan-tint: #E0F7FB;
+  --brand-violet: #8B5CF6;
+  --brand-violet-tint: #F1EBFF;
+  --brand-pink: #EC4899;
+  --brand-pink-tint: #FDE8F3;
+
+  --success: #10B981;
+  --success-tint: #DDF7EC;
+  --success-text: #047857;
+
+  --warning: #F59E0B;
+  --warning-tint: #FEF1D6;
+  --warning-text: #B45309;
+
+  --danger: #EF4444;
+  --danger-tint: #FDE4E4;
+  --danger-text: #B91C1C;
 }
 
 body {
-  background-color: #070B14;
-  color: #F8FAFC;
+  background-color: #F6F8FC;
+  color: #0B1220;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle background cyber grid */
-.cyber-grid-bg {
-  background-size: 40px 40px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+/* Subtle light dot grid for canvas & hero background */
+.dot-grid-bg {
+  background-color: #F6F8FC;
+  background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-/* Glassmorphism Panel standard */
-.glass-panel {
-  background: rgba(13, 20, 36, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+/* Crisp light card standard */
+.card-clean {
+  background-color: #FFFFFF;
+  border: 1px solid #E3E8F2;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
-.glass-panel-elevated {
-  background: rgba(18, 28, 51, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(34, 211, 238, 0.2);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(34, 211, 238, 0.2);
+.card-clean-hover {
+  background-color: #FFFFFF;
+  border: 1px solid #E3E8F2;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-clean-hover:hover {
+  border-color: #CBD5E6;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  transform: translateY(-2px);
 }
 
-/* Glowing effects */
-.glow-cyan {
-  box-shadow: 0 0 20px -3px rgba(34, 211, 238, 0.4);
-}
-
-.glow-emerald {
-  box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.4);
-}
-
-.glow-red {
-  box-shadow: 0 0 20px -3px rgba(239, 68, 68, 0.4);
-}
-
-/* Custom scrollbars */
+/* Clean light scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(7, 11, 20, 0.8);
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
+  background: #CBD5E1;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 211, 238, 0.4);
+  background: #94A3B8;
 }
 
-/* Cytoscape container reset */
+/* Graph container reset */
 #cy {
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
   left: 0;
+}
+
+/* Interactive Cursor Spotlight (for Demo Director) */
+.cursor-spotlight {
+  pointer-events: none;
+  position: fixed;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.12) 0%, rgba(79, 70, 229, 0) 70%);
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  transition: transform 0.08s ease-out;
 }

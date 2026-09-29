@@ -4,13 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
-  GitBranch, ShieldAlert, ArrowLeft, ArrowUpRight, Lock, Eye, Clock, CheckCircle2
+  GitBranch, ShieldAlert, ArrowLeft, ArrowUpRight, Lock, Eye, Clock, CheckCircle2,
+  Sparkles, ExternalLink
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { formatUSD, formatINR, formatIST, truncateAddress } from '@/lib/formatters';
 import { ChainBadge } from '@/components/common/ChainBadge';
 import { RiskBadge } from '@/components/common/RiskBadge';
 import { AddressChip } from '@/components/common/AddressChip';
+import { RiskGauge } from '@/components/ui/RiskGauge';
+import { Button } from '@/components/ui/Button';
 
 export default function WalletProfilePage() {
   const params = useParams();
@@ -38,24 +41,24 @@ export default function WalletProfilePage() {
 
   if (loading) {
     return (
-      <div className="p-12 text-center text-slate-400 font-mono text-xs">
+      <div className="p-12 text-center text-muted font-mono text-xs">
         Loading Wallet Forensic Profile...
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-5xl mx-auto text-slate-100">
+    <div className="p-6 lg:p-8 space-y-6 max-w-5xl mx-auto text-primary">
       <Link
         href="/dashboard"
-        className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-cyan-400 transition-colors"
+        className="inline-flex items-center gap-2 text-xs font-semibold text-secondary hover:text-brand-indigo transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to Command Center</span>
       </Link>
 
       {/* Main Profile Card */}
-      <div className="p-6 rounded-2xl glass-panel border border-white/10 space-y-5">
+      <div className="p-6 rounded-2xl bg-surface border border-border shadow-xs space-y-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -63,7 +66,7 @@ export default function WalletProfilePage() {
               <RiskBadge score={profile?.risk_score || 85} category={profile?.risk_category} />
             </div>
             <div>
-              <span className="text-[10px] text-slate-400 font-semibold uppercase block">
+              <span className="text-[10px] text-muted font-bold uppercase block font-mono">
                 Investigated Target Address
               </span>
               <div className="mt-1">
@@ -72,72 +75,56 @@ export default function WalletProfilePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => router.push(`/trace/demo`)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-black font-extrabold text-xs shadow-glow-cyan"
+          <div className="flex items-center gap-2.5">
+            <Link href={`/trace/demo`}>
+              <Button variant="primary" icon={<Sparkles className="w-4 h-4" />}>
+                Trace Outflows
+              </Button>
+            </Link>
+            <Button
+              variant="secondary"
+              icon={<Eye className="w-4 h-4" />}
+              onClick={() => alert(`Address added to 24/7 Watchlist.`)}
             >
-              <GitBranch className="w-4 h-4" />
-              <span>Trace Graph Outflows</span>
-            </button>
+              Watchlist
+            </Button>
           </div>
         </div>
 
-        {/* 3 Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-white/10 text-xs">
-          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-white/5 space-y-1">
-            <span className="text-slate-400 block font-medium">Recorded Ledger Balance</span>
-            <div className="text-lg font-bold text-white font-mono">
-              {formatUSD(profile?.balance_usd || 120.0)}
+        {/* 3 Metric Cards + Risk Gauge */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-border">
+          <div className="p-4 rounded-xl bg-subtle/50 border border-border space-y-1">
+            <span className="text-muted block font-bold uppercase font-mono text-[10px]">On-Chain Holdings</span>
+            <div className="text-xl font-black text-primary font-display">
+              {formatUSD(profile?.balance_usd || 48210.0)}
             </div>
-            <div className="text-[10px] text-slate-500 font-mono">
-              ≈ {formatINR((profile?.balance_usd || 120.0) * 83.5, true)}
-            </div>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-white/5 space-y-1">
-            <span className="text-slate-400 block font-medium">Entity Classification</span>
-            <div className="text-base font-bold text-cyan-300">
-              {profile?.entity_type || 'BURNER / MULE'}
-            </div>
-            <div className="text-[10px] text-slate-500 font-mono">
-              Transaction Count: {profile?.tx_count || 12}
+            <div className="text-[10px] text-muted font-mono">
+              ≈ {formatINR((profile?.balance_usd || 48210.0) * 83.5, true)}
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-white/5 space-y-1">
-            <span className="text-slate-400 block font-medium">Lifecycle Observation</span>
-            <div className="text-xs text-slate-200">
-              First Seen: {formatIST(profile?.first_seen)}
+          <div className="p-4 rounded-xl bg-subtle/50 border border-border space-y-1">
+            <span className="text-muted block font-bold uppercase font-mono text-[10px]">Entity Classification</span>
+            <div className="text-lg font-bold text-primary">
+              {profile?.entity_type || 'SUSPECT_INTERMEDIARY'}
             </div>
-            <div className="text-[10px] text-slate-400">
-              Last Outflow: {formatIST(profile?.last_seen)}
+            <div className="text-[10px] text-muted font-mono">Heuristic Cluster</div>
+          </div>
+
+          <div className="p-4 rounded-xl bg-subtle/50 border border-border space-y-1">
+            <span className="text-muted block font-bold uppercase font-mono text-[10px]">Total Outflow Traced</span>
+            <div className="text-xl font-black text-semantic-dangerText font-display">
+              $94,200.00
             </div>
+            <div className="text-[10px] text-muted font-mono">3 Dispersal Waves</div>
+          </div>
+
+          <div className="p-3 rounded-xl bg-subtle/50 border border-border flex flex-col items-center justify-center">
+            <div className="text-[10px] text-muted font-bold uppercase font-mono mb-1">Risk Gauge</div>
+            <RiskGauge score={profile?.risk_score || 85} size={130} showLabels={false} />
           </div>
         </div>
       </div>
-
-      {/* Risk Contributing Factors */}
-      {profile?.risk_factors && profile.risk_factors.length > 0 && (
-        <div className="p-5 rounded-2xl glass-panel border border-white/10 space-y-3 text-xs">
-          <h3 className="font-bold text-white uppercase tracking-wider flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-rose-400" />
-            <span>Forensic Risk Contributing Factors</span>
-          </h3>
-
-          <div className="space-y-2">
-            {profile.risk_factors.map((f: any, idx: number) => (
-              <div key={idx} className="p-3 rounded-xl bg-slate-900/80 border border-white/5 flex items-center justify-between">
-                <div>
-                  <span className="font-bold text-white">{f.factor}</span>
-                  <p className="text-[11px] text-slate-400">{f.detail}</p>
-                </div>
-                <span className="font-mono font-bold text-rose-400 text-sm">{f.weight}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

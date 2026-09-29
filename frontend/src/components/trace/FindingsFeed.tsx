@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AlertCircle, ShieldAlert, Sparkles, Building2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle, ShieldAlert, Zap, ArrowRight } from 'lucide-react';
 import { Finding } from '@/lib/types';
 
 interface FindingsFeedProps {
@@ -9,74 +9,78 @@ interface FindingsFeedProps {
 }
 
 export const FindingsFeed: React.FC<FindingsFeedProps> = ({ findings }) => {
-  if (!findings || findings.length === 0) {
-    return (
-      <div className="p-4 text-center text-xs text-slate-500 italic">
-        Awaiting heuristic AML analysis...
-      </div>
-    );
-  }
-
   return (
-    <div className="p-4 space-y-3">
-      <div className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-        <span>Forensic Findings</span>
-        <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 font-mono">
-          {findings.length} Tagged
+    <div className="p-5 space-y-3 bg-surface text-primary">
+      <div className="flex items-center justify-between">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-muted font-mono">
+          Heuristic Findings Stream
+        </h4>
+        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-subtle text-secondary font-bold">
+          {findings.length} Signals
         </span>
       </div>
 
-      <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-        {findings.map((f, idx) => {
-          const isVasp = f.type === 'VASP_HIT';
-          const isMixer = f.type === 'MIXER';
-          const isCritical = f.severity === 'CRITICAL';
+      <div className="space-y-2.5 overflow-y-auto max-h-[360px] pr-1">
+        {findings.length === 0 ? (
+          <div className="text-center py-6 text-muted text-xs">
+            Awaiting heuristic engine outputs...
+          </div>
+        ) : (
+          findings.map((f, idx) => {
+            const isHigh = f.severity === 'HIGH' || f.severity === 'CRITICAL';
+            const isMedium = (f.severity as string) === 'MEDIUM' || (f.severity as string) === 'WARNING';
 
-          return (
-            <div
-              key={idx}
-              className={`p-3 rounded-xl border text-xs transition-all ${
-                isVasp
-                  ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-100 shadow-glow-emerald'
-                  : isMixer
-                  ? 'bg-purple-950/30 border-purple-500/40 text-purple-100'
-                  : isCritical
-                  ? 'bg-red-950/30 border-red-500/40 text-red-100'
-                  : 'bg-slate-900/80 border-white/5 text-slate-200'
-              }`}
-            >
-              <div className="flex items-start justify-between gap-2 mb-1.5">
-                <div className="flex items-center gap-1.5 font-bold">
-                  {isVasp ? (
-                    <Building2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  ) : isCritical ? (
-                    <ShieldAlert className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                  ) : (
-                    <AlertCircle className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                  )}
-                  <span className="line-clamp-1">{f.title}</span>
+            return (
+              <div
+                key={idx}
+                className={`p-3 rounded-xl border text-xs space-y-2 transition-all ${
+                  isHigh
+                    ? 'bg-semantic-dangerTint/40 border-semantic-danger/30'
+                    : isMedium
+                    ? 'bg-semantic-warningTint/40 border-semantic-warning/30'
+                    : 'bg-subtle/60 border-border'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className={`px-2 py-0.2 rounded-full font-mono font-bold text-[9px] uppercase ${
+                    isHigh 
+                      ? 'bg-semantic-dangerTint text-semantic-dangerText border border-semantic-danger/30' 
+                      : isMedium
+                      ? 'bg-semantic-warningTint text-semantic-warningText border border-semantic-warning/30'
+                      : 'bg-brand-indigoTint text-brand-indigo border border-brand-indigo/30'
+                  }`}>
+                    {f.severity}
+                  </span>
+                  <span className="text-[10px] font-mono text-muted">
+                    Hop {f.hop || 1}
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-slate-300 font-bold shrink-0">
-                  {Math.round(f.confidence * 100)}%
-                </span>
-              </div>
 
-              <p className="text-[11px] text-slate-300/90 leading-relaxed mb-2">
-                {f.description}
-              </p>
+                <div className="font-bold text-primary leading-tight">
+                  {f.pattern_name || f.title}
+                </div>
+                
+                <p className="text-[11px] text-secondary leading-snug">
+                  {f.description}
+                </p>
 
-              {/* Confidence progress bar */}
-              <div className="w-full h-1 rounded-full bg-black/40 overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${
-                    isVasp ? 'bg-emerald-400' : isCritical ? 'bg-red-500' : 'bg-cyan-400'
-                  }`}
-                  style={{ width: `${Math.round(f.confidence * 100)}%` }}
-                />
+                {/* Confidence Bar */}
+                <div className="space-y-1 pt-1">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-muted">
+                    <span>Attribution Confidence</span>
+                    <span className="font-bold text-primary">{Math.round(f.confidence * 100)}%</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-border overflow-hidden">
+                    <div
+                      className="h-full bg-brand-indigo rounded-full transition-all duration-500"
+                      style={{ width: `${Math.round(f.confidence * 100)}%` }}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Send, Lock, FileText, CheckCircle2, Shield } from 'lucide-react';
-import { api } from '@/lib/api';
-import { formatUSD, formatINR } from '@/lib/formatters';
+import { X, Send, Lock, FileText, CheckCircle2, Shield, Landmark } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { formatUSD, formatINR, truncateAddress } from '@/lib/formatters';
 
 interface FreezeModalProps {
   isOpen: boolean;
@@ -26,7 +26,6 @@ export const FreezeModal: React.FC<FreezeModalProps> = ({
   amountUsd = 48210.0,
   onSuccess
 }) => {
-  const [legalProvision, setLegalProvision] = useState('Section 106 BNSS 2023 / Section 94 CrPC');
   const [sending, setSending] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
 
@@ -63,8 +62,7 @@ Maharashtra Cyber Crime Investigation Cell / I4C Desk`;
   const handleSendFreeze = async () => {
     setSending(true);
     try {
-      // In demo mode, simulate sending
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 900));
       setSentSuccess(true);
       setTimeout(() => {
         setSentSuccess(false);
@@ -79,27 +77,33 @@ Maharashtra Cyber Crime Investigation Cell / I4C Desk`;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+    <div 
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200"
+    >
       <div 
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl rounded-2xl glass-panel-elevated border border-emerald-400/40 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="w-full max-w-2xl rounded-2xl bg-surface border border-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-primary"
       >
         {/* Modal Header */}
-        <div className="p-4 px-6 border-b border-white/10 flex items-center justify-between bg-slate-950/70">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
-              <Lock className="w-5 h-5" />
+        <div className="p-5 px-6 border-b border-border flex items-center justify-between bg-canvas/70">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-semantic-successTint text-semantic-successText border border-semantic-success/30 flex items-center justify-center font-bold">
+              <Lock className="w-5 h-5 text-semantic-success" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white tracking-wide">
-                Issue Emergency Freeze Notice
+              <h3 className="text-base font-bold font-display text-primary">
+                Issue Emergency Freeze Requisition
               </h3>
-              <p className="text-[11px] text-emerald-400/80 font-mono">
+              <p className="text-xs text-secondary font-mono">
                 Statutory Notice under Section 106 BNSS 2023 · Target: {vaspName}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button 
+            onClick={onClose} 
+            className="p-1 rounded-lg text-muted hover:text-primary hover:bg-subtle transition-colors"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -108,47 +112,51 @@ Maharashtra Cyber Crime Investigation Cell / I4C Desk`;
         <div className="p-6 space-y-4 overflow-y-auto flex-1">
           {sentSuccess ? (
             <div className="py-12 text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-400 flex items-center justify-center mx-auto shadow-glow-emerald animate-bounce">
-                <CheckCircle2 className="w-8 h-8" />
+              <div className="w-16 h-16 rounded-full bg-semantic-successTint text-semantic-success border-2 border-semantic-success flex items-center justify-center mx-auto animate-bounce">
+                <CheckCircle2 className="w-8 h-8 text-semantic-success" />
               </div>
-              <h4 className="text-lg font-bold text-white">Notice Dispatched to {vaspName} Nodal Desk</h4>
-              <p className="text-xs text-slate-300 max-w-md mx-auto">
+              <h4 className="text-lg font-bold text-primary font-display">
+                Notice Dispatched to {vaspName} Nodal Desk
+              </h4>
+              <p className="text-xs text-secondary max-w-md mx-auto">
                 Freeze requisition successfully logged in ChainShield Audit Registry and forwarded to compliance. Expected SLA: 24h.
               </p>
             </div>
           ) : (
             <>
               {/* Target Details Grid */}
-              <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-900/80 border border-white/5 text-xs">
+              <div className="grid grid-cols-2 gap-3 p-4 rounded-xl bg-subtle/70 border border-border text-xs">
                 <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">Recipient Exchange</span>
-                  <span className="font-bold text-emerald-400">{vaspName} (FIU-IND)</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">Attributed Tainted Amount</span>
-                  <span className="font-mono font-bold text-white">
-                    {formatUSD(amountUsd)} (≈ {formatINR(amountUsd * 83.5, true)})
+                  <span className="text-[10px] text-muted block font-bold uppercase font-mono">Recipient Exchange</span>
+                  <span className="font-bold text-semantic-successText flex items-center gap-1.5 mt-0.5">
+                    <Landmark className="w-3.5 h-3.5" /> {vaspName} (FIU-IND Registered)
                   </span>
                 </div>
-                <div className="col-span-2">
-                  <span className="text-[10px] text-slate-400 block font-medium">Suspect Deposit Address</span>
-                  <span className="font-mono text-cyan-300 break-all">{depositAddress}</span>
+                <div>
+                  <span className="text-[10px] text-muted block font-bold uppercase font-mono">Attributed Amount</span>
+                  <span className="font-mono font-bold text-primary text-sm mt-0.5 block">
+                    {formatUSD(amountUsd)} <span className="text-xs text-muted font-normal">({formatINR(amountUsd * 83.5, true)})</span>
+                  </span>
+                </div>
+                <div className="col-span-2 pt-2 border-t border-border">
+                  <span className="text-[10px] text-muted block font-bold uppercase font-mono">Suspect Deposit Address</span>
+                  <span className="font-mono text-brand-indigo font-bold break-all">{depositAddress}</span>
                 </div>
               </div>
 
-              {/* Editable Legal Letter */}
+              {/* Editable Legal Letter in Paper Container */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <label className="font-semibold text-slate-300 flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-cyan-400" /> Formal Legal Notice Text (Editable)
+                  <label className="font-semibold text-secondary flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-brand-indigo" /> Formal Statutory Notice Text (Editable)
                   </label>
-                  <span className="text-[10px] text-amber-400 font-mono">TEMPLATE — Verify prior to use</span>
+                  <span className="text-[10px] text-semantic-warningText font-mono font-bold">TEMPLATE — Section 106 BNSS</span>
                 </div>
                 <textarea
-                  rows={10}
+                  rows={9}
                   value={noticeContent}
                   onChange={(e) => setNoticeContent(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-slate-950/80 border border-white/10 font-mono text-xs text-slate-200 focus:outline-none focus:border-cyan-400 leading-relaxed resize-none"
+                  className="w-full p-3.5 rounded-xl bg-canvas border border-border font-mono text-xs text-primary focus:outline-none focus:border-brand-indigo focus:ring-4 focus:ring-brand-indigo/10 leading-relaxed resize-none transition-all"
                 />
               </div>
             </>
@@ -157,26 +165,23 @@ Maharashtra Cyber Crime Investigation Cell / I4C Desk`;
 
         {/* Modal Footer */}
         {!sentSuccess && (
-          <div className="p-4 px-6 border-t border-white/10 bg-slate-950/70 flex items-center justify-between">
-            <span className="text-[11px] text-slate-400 flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-cyan-400" /> Signed by IO Rajan Sharma (MH-CY-8841)
+          <div className="p-4 px-6 border-t border-border bg-canvas/70 flex items-center justify-between">
+            <span className="text-xs text-muted flex items-center gap-1.5 font-medium">
+              <Shield className="w-3.5 h-3.5 text-brand-indigo" /> Signed by IO Rajan Sharma (MH-CY-8841)
             </span>
 
-            <div className="flex items-center gap-3">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white transition-colors"
-              >
+            <div className="flex items-center gap-2.5">
+              <Button variant="secondary" onClick={onClose}>
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="success"
+                loading={sending}
                 onClick={handleSendFreeze}
-                disabled={sending}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs shadow-glow-emerald transition-all disabled:opacity-50"
+                icon={<Send className="w-3.5 h-3.5" />}
               >
-                <Send className="w-3.5 h-3.5" />
-                <span>{sending ? 'Dispatching...' : 'Dispatch Freeze Notice'}</span>
-              </button>
+                {sending ? 'Dispatching...' : 'Dispatch Freeze Notice'}
+              </Button>
             </div>
           </div>
         )}

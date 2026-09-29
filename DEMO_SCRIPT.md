@@ -11,17 +11,19 @@
 
 ---
 
-## 🎬 Scene 1: Cinematic Officer Login (0:00 – 0:35)
+## 🎬 Scene 1: Bright Intelligence Officer Login (0:00 – 0:35)
 **Visual:**
 - Open `http://localhost:3000`
-- The screen shows a cyber-intelligence command center split screen with a subtle animated network grid on the left and a glassmorphism login card on the right.
+- The screen shows a stunning 60/40 split screen:
+  - Left (60%): Vivid gradient mesh panel (indigo→violet→pink) with a light drifting network graph (white nodes, soft edges), floating stat cards ("94.2% attribution confidence", "< 8s to VASP", "₹122.9 Cr recovered"), headline "From victim complaint to exchange freeze request in seconds."
+  - Right (40%): Crisp white login card, official LEA badge, quick demo officer selection chips.
 
 **Voiceover / Action:**
 1. *"Welcome to ChainShield — the real-time crypto fraud attribution and asset recovery platform purpose-built for Indian Law Enforcement Agencies, State Cyber Cells, and the Indian Cybercrime Coordination Centre (I4C)."*
-2. Point out the 3 macro stats on the left: **₹ 318 Cr+ Fraud Flagged**, **6.4s Avg Attribution**, and **15 State Cyber Cells Live**.
-3. Click the quick-chip **`io@demo.gov.in (IO)`** to auto-populate the officer credentials.
-4. Click **Proceed to MFA** → Smooth transition to the 6-digit cryptographic security code screen.
-5. Code `123456` is pre-entered. Click **Verify & Enter Command Center**.
+2. Point out the vivid stats on the left and the clean, high-contrast light design language ("Bright Intelligence") built for daytime courtroom clarity.
+3. Click the demo account chip **`IO Rajan Sharma (MH Cyber Crime Cell)`** to auto-populate credentials.
+4. Click **Continue to OTP Verification** → Smooth transition to the 6-digit cryptographic security code boxes.
+5. Code `582941` is pre-entered. Click **Authorize Terminal Session** to enter the Command Center.
 
 ---
 

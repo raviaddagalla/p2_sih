@@ -28,7 +28,7 @@ export const AddressChip: React.FC<AddressChipProps> = ({
     if (!address) return;
     navigator.clipboard.writeText(address);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const getExplorerUrl = () => {
@@ -41,6 +41,10 @@ export const AddressChip: React.FC<AddressChipProps> = ({
         return `https://etherscan.io/address/${address}`;
       case 'BSC':
         return `https://bscscan.com/address/${address}`;
+      case 'POLYGON':
+        return `https://polygonscan.com/address/${address}`;
+      case 'SOL':
+        return `https://solscan.io/account/${address}`;
       default:
         return '#';
     }
@@ -49,28 +53,32 @@ export const AddressChip: React.FC<AddressChipProps> = ({
   return (
     <div
       onClick={handleCopy}
-      title="Click to copy address"
-      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-900/80 border border-white/10 hover:border-cyan-400/50 hover:bg-slate-800/90 transition-all cursor-pointer font-mono text-xs text-slate-200 group"
+      title="Click to copy full address"
+      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-subtle border border-border hover:border-brand-indigo/40 hover:bg-brand-indigoTint transition-all cursor-pointer font-mono text-xs text-primary group"
     >
-      <span className="text-cyan-300 font-semibold group-hover:text-cyan-200">
+      <span className="font-semibold text-brand-indigo group-hover:text-brand-indigoHover">
         {truncateAddress(address, lead, tail)}
       </span>
+
       {showCopy && (
-        <span className="text-slate-400 group-hover:text-cyan-300 transition-colors">
+        <span className="text-muted group-hover:text-brand-indigo transition-colors flex items-center">
           {copied ? (
-            <Check className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="flex items-center gap-1 text-[10px] text-semantic-success font-bold font-sans">
+              <Check className="w-3 h-3 text-semantic-success" /> Copied
+            </span>
           ) : (
             <Copy className="w-3.5 h-3.5" />
           )}
         </span>
       )}
+
       {showExplorer && (
         <a
           href={getExplorerUrl()}
           target="_blank"
           rel="noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="text-slate-400 hover:text-cyan-300 ml-0.5"
+          className="text-muted hover:text-brand-indigo ml-0.5"
           title="Open in Blockchain Explorer"
         >
           <ExternalLink className="w-3.5 h-3.5" />

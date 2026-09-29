@@ -34,6 +34,7 @@ backend/generated_reports/
 generated_reports/
 
 # Node.js & Next.js
+*.tsbuildinfo
 frontend/node_modules/
 node_modules/
 frontend/.next/

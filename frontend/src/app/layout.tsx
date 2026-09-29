@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { Topbar } from '@/components/layout/Topbar';
-import { CommandPalette } from '@/components/layout/CommandPalette';
-import { DemoModePanel } from '@/components/common/DemoModePanel';
+import { AppShell } from '@/components/layout/AppShell';
 
 export const metadata: Metadata = {
   title: 'ChainShield — Real-Time Crypto Fraud Attribution Platform',
@@ -16,20 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-[#070B14] text-slate-100 min-h-screen antialiased">
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <div className="flex-1 flex flex-col min-w-0">
-            <Topbar />
-            <main className="flex-1 overflow-y-auto">
-              {children}
-            </main>
-          </div>
-        </div>
-
-        <CommandPalette />
-        <DemoModePanel />
+    <html lang="en">
+      <body className="bg-canvas text-primary min-h-screen antialiased selection:bg-brand-indigoTint selection:text-brand-indigo">
+        <AppShell>
+          {children}
+        </AppShell>
       </body>
     </html>
   );

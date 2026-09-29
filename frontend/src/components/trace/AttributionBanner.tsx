@@ -4,6 +4,7 @@ import React from 'react';
 import { Landmark, Lock, FileDown, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 import { VASPAttribution } from '@/lib/types';
 import { formatUSD, formatINR, truncateAddress } from '@/lib/formatters';
+import { Button } from '@/components/ui/Button';
 
 interface AttributionBannerProps {
   attribution: VASPAttribution;
@@ -18,73 +19,79 @@ export const AttributionBanner: React.FC<AttributionBannerProps> = ({
   onDownloadReport,
   onFollowMoney
 }) => {
+  // Monogram helper
+  const monogram = attribution.vasp_name
+    .replace(/[^a-zA-Z]/g, '')
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
-    <div className="mx-4 my-3 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-cyan-950/80 border border-emerald-400/50 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-300">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Left: VASP Hit Information */}
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-400 shadow-glow-emerald shrink-0">
-            <Landmark className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px] uppercase font-mono tracking-wider border border-emerald-500/30 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                VASP Deposit Attributed
-              </span>
-              <span className="text-xs text-slate-400 font-mono">
-                Hop {attribution.hop} · {Math.round(attribution.confidence * 100)}% Confidence
-              </span>
-            </div>
-            
-            <div className="text-base sm:text-lg font-black text-white font-sans mt-0.5 flex items-baseline gap-2">
-              <span className="text-emerald-400">{attribution.vasp_name}</span>
-              <span className="text-slate-300 font-normal text-sm">
-                received <strong className="font-mono text-cyan-300">{formatUSD(attribution.amount_usd)}</strong>
-              </span>
-              <span className="text-xs text-slate-400 font-mono">
-                (≈ {formatINR(attribution.amount_usd * 83.5, true)})
-              </span>
-            </div>
-
-            <div className="text-[11px] text-slate-300 font-mono mt-0.5">
-              Deposit Account: <span className="text-cyan-300">{truncateAddress(attribution.deposit_address, 10, 8)}</span>
-              {attribution.fiu_registered && (
-                <span className="ml-2 text-emerald-400 font-semibold font-sans">
-                  · FIU-IND Registered
-                </span>
-              )}
-            </div>
-          </div>
+    <div className="mx-6 my-4 p-5 rounded-2xl bg-surface border-2 border-semantic-success/50 shadow-lg shadow-semantic-success/10 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-3 duration-300">
+      {/* Left: VASP Hit Information */}
+      <div className="flex items-center gap-4">
+        {/* Monogram Avatar with Emerald Accent Ring */}
+        <div className="w-14 h-14 rounded-2xl bg-semantic-successTint border border-semantic-success/40 flex items-center justify-center font-display font-black text-lg text-semantic-successText shrink-0 shadow-sm">
+          {monogram}
         </div>
 
-        {/* Right: Actions */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={onGenerateFreeze}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-black font-extrabold text-xs shadow-glow-emerald transition-all"
-          >
-            <Lock className="w-4 h-4 fill-black/20" />
-            <span>Issue Section 106 Freeze Notice</span>
-          </button>
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full bg-semantic-successTint text-semantic-successText font-bold text-[11px] uppercase font-mono tracking-wider border border-semantic-success/30 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-semantic-success" />
+              Exchange Identified · Hop {attribution.hop} · {Math.round(attribution.confidence * 100)}% Confidence
+            </span>
+            {attribution.fiu_registered && (
+              <span className="text-[11px] font-semibold text-semantic-successText font-sans">
+                · FIU-IND Registered
+              </span>
+            )}
+          </div>
+          
+          <div className="text-lg font-black text-primary font-display mt-1 flex flex-wrap items-baseline gap-2">
+            <span className="text-semantic-successText">{attribution.vasp_name}</span>
+            <span className="text-secondary font-medium text-sm">
+              received <strong className="font-mono text-primary font-bold">{formatUSD(attribution.amount_usd)}</strong>
+            </span>
+            <span className="text-xs text-muted font-mono font-semibold">
+              (≈ {formatINR(attribution.amount_usd * 83.5, true)})
+            </span>
+          </div>
 
-          <button
-            onClick={onDownloadReport}
-            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-white/10 transition-colors"
-          >
-            <FileDown className="w-4 h-4 text-cyan-400" />
-            <span>Court PDF Report</span>
-          </button>
-
-          <button
-            onClick={onFollowMoney}
-            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 font-semibold text-xs border border-cyan-500/30 transition-colors"
-            title="Trace animation"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Path</span>
-          </button>
+          <div className="text-xs text-secondary font-mono mt-0.5">
+            Deposit Account: <span className="font-bold text-primary">{truncateAddress(attribution.deposit_address, 10, 8)}</span>
+          </div>
         </div>
+      </div>
+
+      {/* Right: 3 CTAs */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          variant="success"
+          size="md"
+          onClick={onGenerateFreeze}
+          icon={<Lock className="w-4 h-4" />}
+          className="shadow-sm"
+        >
+          Generate Freeze Request (Sec 106)
+        </Button>
+
+        <Button
+          variant="secondary"
+          size="md"
+          onClick={onDownloadReport}
+          icon={<FileDown className="w-4 h-4 text-brand-indigo" />}
+        >
+          Download Court PDF Report
+        </Button>
+
+        <Button
+          variant="soft"
+          size="md"
+          onClick={onFollowMoney}
+          icon={<Sparkles className="w-3.5 h-3.5" />}
+        >
+          View Timeline Path
+        </Button>
       </div>
     </div>
   );

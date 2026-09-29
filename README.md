@@ -30,7 +30,7 @@ ChainShield is an advanced cryptocurrency intelligence, forensic attribution, an
 
 - **Frontend:** Next.js 14+ (App Router), TypeScript (Strict), Tailwind CSS, Cytoscape.js + Dagre, Framer Motion, Recharts, Lucide Icons, Zustand, Radix Primitives.
 - **Backend:** Python 3.11/3.13, FastAPI (Async), SQLAlchemy 2.0, aiosqlite / PostgreSQL, ReportLab, Scikit-Learn, NetworkX, Uvicorn.
-- **Design System:** Cyber-intelligence command center theme (`#070B14`, electric cyan `#22D3EE`, emerald `#10B981`, glassmorphism blur).
+- **Design System:** "Bright Intelligence" institutional light-theme (`--bg-canvas: #F6F8FC`, pure white cards `#FFFFFF`, crisp borders `#E3E8F2`, vivid brand indigo `#4F46E5`, cyan `#06B6D4`, violet `#8B5CF6`, pink `#EC4899`, and WCAG AA semantic status tints).
 
 ---
 

@@ -2,13 +2,16 @@
 
 import React, { useState } from 'react';
 import { 
-  FileText, Download, CheckCircle2, Shield, Printer, FileDown, Eye
+  FileText, Download, CheckCircle2, Shield, Printer, FileDown, Eye, Check, Sliders
 } from 'lucide-react';
 import { formatUSD, formatINR } from '@/lib/formatters';
+import { Button } from '@/components/ui/Button';
 
 export default function ReportsPage() {
   const [caseNo, setCaseNo] = useState('2024-NCRP-MH-084921');
   const [downloading, setDownloading] = useState(false);
+  const [includeGraph, setIncludeGraph] = useState(true);
+  const [includeHashes, setIncludeHashes] = useState(true);
 
   const handleDownload = () => {
     setDownloading(true);
@@ -17,119 +20,174 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-5xl mx-auto text-slate-100">
+    <div className="p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-primary">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400">
-              <FileText className="w-5 h-5" />
+            <span className="w-2.5 h-2.5 rounded-full bg-brand-indigo" />
+            <span className="text-xs font-bold uppercase tracking-wider text-muted font-mono">
+              JUDICIAL EVIDENCE GENERATOR
             </span>
-            <h2 className="text-xl font-extrabold text-white">
-              Court & LEA Investigation Report Generator
-            </h2>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <h1 className="text-2xl font-black font-display text-primary mt-1">
+            Court & LEA Investigation Report Generator
+          </h1>
+          <p className="text-xs text-secondary mt-0.5">
             Standardized cryptographic forensic dossier formatted for Indian Judicial Courts & FIU-IND submission.
           </p>
         </div>
 
-        <button
+        <Button
+          variant="primary"
+          size="lg"
+          loading={downloading}
           onClick={handleDownload}
-          disabled={downloading}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-black font-extrabold text-xs shadow-glow-cyan transition-all"
+          icon={<FileDown className="w-4 h-4" />}
         >
-          <FileDown className="w-4 h-4 fill-black" />
-          <span>{downloading ? 'Compiling PDF...' : 'Download Court PDF Report'}</span>
-        </button>
+          {downloading ? 'Compiling PDF...' : 'Download Official PDF Report'}
+        </Button>
       </div>
 
-      {/* Report Paper Preview Pane */}
-      <div className="p-8 rounded-2xl bg-white text-slate-900 shadow-2xl space-y-6 font-sans border border-slate-300">
-        {/* Paper Header */}
-        <div className="text-center border-b-2 border-sky-600 pb-4 space-y-1">
-          <div className="text-xs font-bold text-red-600 uppercase tracking-widest">
-            CONFIDENTIAL // FOR OFFICIAL LAW ENFORCEMENT & JUDICIAL USE ONLY
+      {/* Split View: Options on Left, Live Paper Preview on Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Dossier Options (4 cols) */}
+        <div className="lg:col-span-4 p-6 rounded-2xl bg-surface border border-border shadow-xs space-y-6">
+          <div>
+            <h3 className="text-sm font-bold text-primary font-display uppercase tracking-wider">
+              Dossier Configuration
+            </h3>
+            <p className="text-xs text-secondary mt-0.5">
+              Select case parameters to include in the generated cryptographic audit record.
+            </p>
           </div>
-          <h1 className="text-xl font-black text-slate-900 tracking-tight">
-            STATE CYBER CRIME INVESTIGATION DIVISION
-          </h1>
-          <h2 className="text-xs font-bold text-sky-700 tracking-wider">
-            CRYPTOCURRENCY FORENSIC TRACING & VASP ATTRIBUTION REPORT
-          </h2>
-          <div className="text-[10px] text-slate-500 font-mono">
-            Document Seal: SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-          </div>
-        </div>
 
-        {/* Case Particulars Table */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
-          <div>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase block">Case Reference:</span>
-            <span className="font-mono font-bold text-slate-800">{caseNo}</span>
-          </div>
-          <div>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase block">Offense Classification:</span>
-            <span className="font-bold text-slate-800">Telegram Task Fraud (USDT)</span>
-          </div>
-          <div>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase block">Quantified Loss:</span>
-            <span className="font-mono font-bold text-slate-800">₹ 42,50,000.00</span>
-          </div>
-          <div>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase block">Statutory Basis:</span>
-            <span className="font-bold text-slate-800">Sec 106 BNSS 2023 / Sec 94 CrPC</span>
-          </div>
-        </div>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-secondary">
+                Target Case Reference
+              </label>
+              <select
+                value={caseNo}
+                onChange={(e) => setCaseNo(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-border bg-canvas text-xs font-mono font-bold text-primary focus:outline-none focus:border-brand-indigo"
+              >
+                <option value="2024-NCRP-MH-084921">2024-NCRP-MH-084921 (TRON Task Scam)</option>
+                <option value="2024-NCRP-DL-03194">2024-NCRP-DL-03194 (BTC Peel Chain)</option>
+                <option value="2024-NCRP-KA-11928">2024-NCRP-KA-11928 (ETH Cross-Chain)</option>
+              </select>
+            </div>
 
-        {/* Section 1: Executive Summary */}
-        <div className="space-y-2 text-xs leading-relaxed text-slate-700">
-          <h3 className="font-bold text-slate-900 border-b border-slate-200 pb-1 text-sm uppercase">
-            1. Executive Forensic Summary
-          </h3>
-          <p>
-            Upon receipt of victim complaint from the National Cyber Crime Reporting Portal (NCRP), automated algorithmic tracing was initiated from the primary suspect wallet (<span className="font-mono bg-slate-100 px-1 py-0.5 rounded text-slate-900 font-bold">TJb1xV9uK4sQm8y2wP4nZ7A3cE6gH8jK9L</span>). ChainShield traversed 4 layering hops and identified an off-ramp deposit of <strong>$48,210.00 USDT</strong> into a custodial exchange account registered with <strong>Binance (FIU-IND Registered VASP)</strong> with <strong>94% attribution confidence</strong>.
-          </p>
-        </div>
+            <div className="space-y-2 pt-2 border-t border-border">
+              <label className="text-xs font-bold text-secondary uppercase font-mono">
+                Evidence Inclusions
+              </label>
 
-        {/* Section 2: VASP Attribution Findings */}
-        <div className="space-y-2 text-xs">
-          <h3 className="font-bold text-slate-900 border-b border-slate-200 pb-1 text-sm uppercase">
-            2. VASP Attribution & Immediate Freeze Target
-          </h3>
-          <div className="p-3.5 rounded-lg border border-emerald-300 bg-emerald-50 text-slate-800 space-y-1.5 font-mono">
-            <div className="flex justify-between">
-              <span>Identified Custodial VASP:</span>
-              <strong className="text-emerald-800 font-sans">Binance (Global / South Asia Desk)</strong>
+              <label className="flex items-center gap-2.5 text-xs text-primary cursor-pointer p-2 rounded-lg hover:bg-subtle">
+                <input
+                  type="checkbox"
+                  checked={includeGraph}
+                  onChange={(e) => setIncludeGraph(e.target.checked)}
+                  className="rounded text-brand-indigo focus:ring-brand-indigo"
+                />
+                <span className="font-medium">Embed Multi-Hop Cytoscape Forensic Graph</span>
+              </label>
+
+              <label className="flex items-center gap-2.5 text-xs text-primary cursor-pointer p-2 rounded-lg hover:bg-subtle">
+                <input
+                  type="checkbox"
+                  checked={includeHashes}
+                  onChange={(e) => setIncludeHashes(e.target.checked)}
+                  className="rounded text-brand-indigo focus:ring-brand-indigo"
+                />
+                <span className="font-medium">Append Raw Transaction Hashes & Merkle Proofs</span>
+              </label>
             </div>
-            <div className="flex justify-between">
-              <span>Suspect Deposit Address:</span>
-              <strong>TZ8nC1m8X7y2wP4nZ7A3cE6gH8jK9LTT5x</strong>
-            </div>
-            <div className="flex justify-between">
-              <span>Attributed Illicit Amount:</span>
-              <strong className="text-slate-900">$48,210.00 USDT (≈ ₹ 40,25,535.00)</strong>
-            </div>
-            <div className="flex justify-between">
-              <span>Attribution Hop Distance:</span>
-              <strong>4 Hops from Victim Mule</strong>
+
+            <div className="p-3.5 rounded-xl bg-subtle/70 border border-border text-xs text-secondary space-y-1">
+              <div className="font-bold text-primary flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-brand-indigo" />
+                Section 65B Evidence Act Certification
+              </div>
+              <p className="text-[11px] leading-snug">
+                This document is generated with an immutable SHA-256 digital fingerprint valid under Indian Evidence Act Section 65B.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Signature Box */}
-        <div className="pt-6 border-t-2 border-slate-300 grid grid-cols-2 text-xs">
-          <div>
-            <strong>Investigating Officer:</strong><br />
-            Inspector Rajan Sharma<br />
-            Maharashtra Cyber Crime Cell<br />
-            Badge: MH-CY-2024-8841
+        {/* Right Column: Paper-Style Live Preview (8 cols) */}
+        <div className="lg:col-span-8 p-10 rounded-2xl bg-white text-slate-900 shadow-xl border border-border-strong space-y-6 font-sans">
+          {/* Paper Header */}
+          <div className="text-center border-b-2 border-brand-indigo pb-5 space-y-1.5">
+            <div className="text-[11px] font-bold text-semantic-dangerText uppercase tracking-widest font-mono">
+              CONFIDENTIAL // FOR OFFICIAL LAW ENFORCEMENT & JUDICIAL USE ONLY
+            </div>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight font-display">
+              STATE CYBER CRIME INVESTIGATION DIVISION
+            </h2>
+            <h3 className="text-xs font-bold text-brand-indigo tracking-wider">
+              CRYPTOCURRENCY FORENSIC TRACING & VASP ATTRIBUTION REPORT
+            </h3>
+            <div className="text-[10px] text-slate-500 font-mono">
+              Digital Signature Seal: SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+            </div>
           </div>
-          <div className="text-right">
-            <strong>Approved By:</strong><br />
-            SP Meenakshi Sundaram, IPS<br />
-            Superintendent of Police<br />
-            State Cyber Crime Command
+
+          {/* Case Particulars Table */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+            <div>
+              <span className="text-[10px] text-slate-500 font-semibold uppercase block">Case Reference:</span>
+              <span className="font-mono font-bold text-slate-800">{caseNo}</span>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-500 font-semibold uppercase block">Incident Typology:</span>
+              <span className="font-bold text-slate-800">TASK_SCAM</span>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-500 font-semibold uppercase block">Victim Loss:</span>
+              <span className="font-mono font-bold text-red-600">₹42,50,000</span>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-500 font-semibold uppercase block">Investigating Unit:</span>
+              <span className="font-semibold text-slate-800">MH Cyber Crime Cell</span>
+            </div>
+          </div>
+
+          {/* Section 1: Executive Summary */}
+          <div className="space-y-2 text-xs text-slate-700 leading-relaxed">
+            <h4 className="font-bold text-slate-900 border-b border-slate-200 pb-1">
+              1. EXECUTIVE FORENSIC SUMMARY
+            </h4>
+            <p>
+              On receipt of NCRP complaint regarding organized task fraud siphoning, ChainShield multi-hop traversal traced victim funds across <strong>4 hops</strong> on the TRON blockchain ledger. Suspect funds totaling <strong>$48,210.00 USD (approx. ₹40,25,535 INR)</strong> were definitively attributed to custodial exchange deposit account <strong>TZ8nC1m8X7y2wP4nZ7A3cE6gH8jK9LTT5x</strong> maintained by <strong>Binance</strong> (FIU-IND Registered).
+            </p>
+          </div>
+
+          {/* Section 2: Attribution Particulars */}
+          <div className="space-y-2 text-xs">
+            <h4 className="font-bold text-slate-900 border-b border-slate-200 pb-1">
+              2. IDENTIFIED VASP & TARGET DEPOSIT WALLET
+            </h4>
+            <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 space-y-1">
+              <div className="font-bold text-sm">Target Exchange: Binance Holdings Ltd. (FIU-IND Verified)</div>
+              <div className="font-mono text-[11px]">Deposit Address: TZ8nC1m8X7y2wP4nZ7A3cE6gH8jK9LTT5x</div>
+              <div className="text-[11px]">
+                Attribution Confidence: <strong>94.2%</strong> · Hop Distance: <strong>Hop 4</strong> · Action: <strong>Section 106 BNSS Notice Issued</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* Signatures Footer */}
+          <div className="pt-6 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
+            <div>
+              <div className="font-bold text-slate-900">IO Rajan Sharma</div>
+              <div className="text-[10px] text-slate-500 font-mono">Investigating Officer (Badge MH-CY-8841)</div>
+            </div>
+            <div className="text-right">
+              <div className="font-bold text-brand-indigo font-mono">CERTIFIED TRUE COPY</div>
+              <div className="text-[10px] text-slate-500 font-mono">Digital Token #CS-MH-8841-2024</div>
+            </div>
           </div>
         </div>
       </div>

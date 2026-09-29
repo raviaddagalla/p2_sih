@@ -2,10 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { 
-  Settings, Users, Shield, Database, Activity, CheckCircle2, Search, FileDown
+  Settings, Users, Shield, Database, Activity, CheckCircle2, Search, FileDown,
+  Building, UserCheck, Lock, ChevronRight
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { formatIST } from '@/lib/formatters';
+import { Button } from '@/components/ui/Button';
 
 export default function AdminPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -35,92 +37,104 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1600px] mx-auto text-slate-100">
+    <div className="p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-primary">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400">
-              <Settings className="w-5 h-5" />
+            <span className="w-2.5 h-2.5 rounded-full bg-brand-indigo" />
+            <span className="text-xs font-bold uppercase tracking-wider text-muted font-mono">
+              SYSTEM & GOVERNANCE
             </span>
-            <h2 className="text-xl font-extrabold text-white">
-              System Administration & Immutable Audit Trail
-            </h2>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Role-based access control (RBAC), multi-agency federation, and tamper-evident audit logging.
+          <h1 className="text-2xl font-black font-display text-primary mt-1">
+            Forensic Administration & Audit Trail
+          </h1>
+          <p className="text-xs text-secondary mt-0.5">
+            Role-based access control (RBAC), multi-agency federation, and tamper-evident forensic audit logs.
           </p>
         </div>
 
-        {/* System Health Chip */}
         {health && (
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/30 text-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-slate-300">System:</span>
-            <span className="text-emerald-400 font-mono font-bold">{health.status}</span>
-            <span className="text-slate-600">|</span>
-            <span className="text-cyan-400 font-mono">6 Chains Synced</span>
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-semantic-successTint border border-semantic-success/30 text-xs text-semantic-successText font-bold font-mono">
+            <span className="w-2 h-2 rounded-full bg-semantic-success animate-pulse" />
+            <span>FastAPI: {health.status} · SQLite / PG Synced</span>
           </div>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl glass-panel border border-white/10 w-fit">
+      <div className="flex items-center gap-2 border-b border-border pb-2">
         <button
           onClick={() => setActiveTab('audit')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'audit' ? 'bg-cyan-500 text-black shadow-glow-cyan' : 'text-slate-400 hover:text-white'
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'audit'
+              ? 'bg-brand-indigo text-white shadow-xs'
+              : 'text-secondary hover:text-primary hover:bg-subtle'
           }`}
         >
-          Immutable Audit Trail ({auditLogs.length})
+          <Activity className="w-4 h-4" />
+          <span>Forensic Audit Trail ({auditLogs.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab('users')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'users' ? 'bg-cyan-500 text-black shadow-glow-cyan' : 'text-slate-400 hover:text-white'
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'users'
+              ? 'bg-brand-indigo text-white shadow-xs'
+              : 'text-secondary hover:text-primary hover:bg-subtle'
           }`}
         >
-          LEA Personnel & Roles ({users.length})
+          <Users className="w-4 h-4" />
+          <span>Authorized Investigators ({users.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab('agencies')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'agencies' ? 'bg-cyan-500 text-black shadow-glow-cyan' : 'text-slate-400 hover:text-white'
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'agencies'
+              ? 'bg-brand-indigo text-white shadow-xs'
+              : 'text-secondary hover:text-primary hover:bg-subtle'
           }`}
         >
-          Federated LEA Agencies ({agencies.length})
+          <Building className="w-4 h-4" />
+          <span>Participating Agencies ({agencies.length})</span>
         </button>
       </div>
 
       {/* Tab 1: Audit Trail */}
       {activeTab === 'audit' && (
-        <div className="rounded-2xl glass-panel border border-white/10 overflow-hidden">
+        <div className="rounded-2xl bg-surface border border-border shadow-xs overflow-hidden">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-white/10 bg-slate-950/60 text-slate-400 font-mono">
-                <th className="p-3.5">Timestamp (IST)</th>
-                <th className="p-3.5">Officer / Personnel</th>
-                <th className="p-3.5">Action Executed</th>
-                <th className="p-3.5">Entity Target</th>
-                <th className="p-3.5">Audit Particulars</th>
-                <th className="p-3.5">IP Address</th>
+              <tr className="border-b border-border bg-subtle/50 text-secondary font-mono text-[11px]">
+                <th className="py-3 px-4">Event Timestamp</th>
+                <th className="py-3 px-4">Officer / Subject</th>
+                <th className="py-3 px-4">Action Type</th>
+                <th className="py-3 px-4">Forensic Target</th>
+                <th className="py-3 px-4">Cryptographic Hash Seal</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 font-sans">
+            <tbody className="divide-y divide-border">
               {auditLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-slate-800/40">
-                  <td className="p-3.5 font-mono text-slate-400">{formatIST(log.created_at)}</td>
-                  <td className="p-3.5 font-bold text-cyan-300">{log.user_name || 'System Auto'}</td>
-                  <td className="p-3.5">
-                    <span className="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-slate-800 text-slate-200">
+                <tr key={log.id} className="hover:bg-subtle/30 transition-colors">
+                  <td className="py-3 px-4 font-mono text-muted text-[11px]">
+                    {formatIST(log.timestamp)}
+                  </td>
+                  <td className="py-3 px-4 font-bold text-primary">
+                    {log.user_id || 'IO Rajan Sharma'}
+                  </td>
+                  <td className="py-3 px-4">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-brand-indigoTint text-brand-indigo border border-brand-indigo/30">
                       {log.action}
                     </span>
                   </td>
-                  <td className="p-3.5 font-mono text-slate-300">{log.entity}</td>
-                  <td className="p-3.5 text-slate-300">{log.metadata?.details || log.metadata?.status || 'Action verified'}</td>
-                  <td className="p-3.5 font-mono text-slate-500">{log.ip || '127.0.0.1'}</td>
+                  <td className="py-3 px-4 font-mono text-secondary">
+                    {log.target_type}: {log.target_id?.slice(0, 14)}...
+                  </td>
+                  <td className="py-3 px-4 font-mono text-muted text-[11px]">
+                    {log.hash_sha256?.slice(0, 24)}...
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -130,30 +144,32 @@ export default function AdminPage() {
 
       {/* Tab 2: Users */}
       {activeTab === 'users' && (
-        <div className="rounded-2xl glass-panel border border-white/10 overflow-hidden">
+        <div className="rounded-2xl bg-surface border border-border shadow-xs overflow-hidden">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-white/10 bg-slate-950/60 text-slate-400 font-mono">
-                <th className="p-3.5">Name</th>
-                <th className="p-3.5">Official Email</th>
-                <th className="p-3.5">LEA Role</th>
-                <th className="p-3.5">Badge / ID</th>
-                <th className="p-3.5">MFA Status</th>
+              <tr className="border-b border-border bg-subtle/50 text-secondary font-mono text-[11px]">
+                <th className="py-3 px-4">Officer Name</th>
+                <th className="py-3 px-4">Official Email</th>
+                <th className="py-3 px-4">Role / Designation</th>
+                <th className="py-3 px-4">Police Badge No.</th>
+                <th className="py-3 px-4">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border">
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-slate-800/40">
-                  <td className="p-3.5 font-bold text-white">{u.name}</td>
-                  <td className="p-3.5 font-mono text-slate-300">{u.email}</td>
-                  <td className="p-3.5">
-                    <span className="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-400/30">
+                <tr key={u.id} className="hover:bg-subtle/30 transition-colors">
+                  <td className="py-3 px-4 font-bold text-primary font-display">{u.name}</td>
+                  <td className="py-3 px-4 font-mono text-secondary">{u.email}</td>
+                  <td className="py-3 px-4">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-subtle text-secondary">
                       {u.role}
                     </span>
                   </td>
-                  <td className="p-3.5 font-mono text-slate-400">{u.badge_no || 'LEA-AUTH'}</td>
-                  <td className="p-3.5 text-emerald-400 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Enforced
+                  <td className="py-3 px-4 font-mono text-brand-indigo font-bold">{u.badge_no}</td>
+                  <td className="py-3 px-4">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-semantic-successTint text-semantic-successText">
+                      ACTIVE
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -164,12 +180,17 @@ export default function AdminPage() {
 
       {/* Tab 3: Agencies */}
       {activeTab === 'agencies' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {agencies.map((ag) => (
-            <div key={ag.id} className="p-4 rounded-2xl glass-panel border border-white/5 space-y-2 text-xs">
-              <h4 className="font-bold text-white text-sm">{ag.name}</h4>
-              <div className="text-slate-400">Jurisdiction: <span className="text-cyan-300">{ag.state}</span></div>
-              <div className="text-[10px] text-slate-500 font-mono">{ag.type}</div>
+            <div key={ag.id} className="p-5 rounded-2xl bg-surface border border-border shadow-xs space-y-2">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-brand-indigo" />
+                <h4 className="font-bold text-sm text-primary font-display">{ag.name}</h4>
+              </div>
+              <p className="text-xs text-secondary font-mono">Jurisdiction: {ag.state}</p>
+              <div className="text-[10px] text-muted font-mono pt-2 border-t border-border">
+                Agency ID: {ag.id}
+              </div>
             </div>
           ))}
         </div>

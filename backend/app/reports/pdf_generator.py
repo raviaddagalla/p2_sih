@@ -47,7 +47,7 @@ def generate_lea_report_pdf(
         fontName="Helvetica-Bold",
         fontSize=10,
         leading=13,
-        textColor=colors.HexColor("#0284C7"),
+        textColor=colors.HexColor("#4F46E5"),
         alignment=1
     )
 
@@ -87,7 +87,7 @@ def generate_lea_report_pdf(
     story.append(Paragraph("FORENSIC BLOCKCHAIN INTELLIGENCE & ASSET ATTRIBUTION REPORT", subtitle_style))
     story.append(Paragraph("CONFIDENTIAL // FOR OFFICIAL LAW ENFORCEMENT & JUDICIAL USE ONLY", ParagraphStyle("conf", parent=subtitle_style, textColor=colors.HexColor("#DC2626"), fontSize=8)))
     story.append(Spacer(1, 8))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#0284C7"), spaceAfter=10))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#4F46E5"), spaceAfter=10))
 
     # 2. Case Details Table
     case_no = case_data.get("case_no", "2024-NCRP-MH-084921")
@@ -160,7 +160,7 @@ def generate_lea_report_pdf(
 
     t_findings = Table(findings_data, colWidths=[140, 65, 285, 50])
     t_findings.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#0F172A")),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#4F46E5")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('BOX', (0,0), (-1,-1), 0.5, colors.HexColor("#CBD5E1")),
         ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor("#E2E8F0")),
